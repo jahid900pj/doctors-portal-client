@@ -2,11 +2,14 @@ import React, { useContext, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../Context/AuthProvider';
+import useToken from '../../hooks/useToken';
 
 const Login = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const { login } = useContext(AuthContext)
     const [loginError, setLoginError] = useState('')
+    const [loginUserEmail, setLoginUserEmail] = useState('')
+    const [token] = useToken(loginUserEmail)
 
     let navigate = useNavigate();
     let location = useLocation();
@@ -19,13 +22,18 @@ const Login = () => {
         login(data.email, data.password)
             .then((result) => {
                 const user = result.user;
-                console.log(user)
-                navigate(from, { replace: true });
+                // console.log(user)
+                setLoginUserEmail(data.email)
+
             })
             .catch(err => {
                 console.log(err.message)
                 setLoginError(err.message)
             })
+    }
+
+    if (token) {
+        navigate(from, { replace: true });
     }
 
     return (
